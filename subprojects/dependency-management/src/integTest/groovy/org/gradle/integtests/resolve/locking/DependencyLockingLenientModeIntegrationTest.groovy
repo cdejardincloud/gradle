@@ -28,14 +28,11 @@ class DependencyLockingLenientModeIntegrationTest extends AbstractLockingIntegra
     }
 
     @Unroll
-    def 'does not fail when lock file conflicts with declared strict constraint'() {
+    def 'does not fail when lock file conflicts with declared strict constraint (initial unique: #unique)'() {
         given:
         mavenRepo.module('org', 'foo', '1.0').publish()
         mavenRepo.module('org', 'foo', '1.1').publish()
 
-        if (unique) {
-            FeaturePreviewsFixture.enableOneLockfilePerProject(settingsFile)
-        }
         buildFile << """
 dependencyLocking {
     lockAllConfigurations()
@@ -82,14 +79,11 @@ dependencies {
     }
 
     @Unroll
-    def 'does not fail when lock file conflicts with declared version constraint'() {
+    def 'does not fail when lock file conflicts with declared version constraint (initial unique: #unique)'() {
         given:
         mavenRepo.module('org', 'foo', '1.0').publish()
         mavenRepo.module('org', 'foo', '1.1').publish()
 
-        if (unique) {
-            FeaturePreviewsFixture.enableOneLockfilePerProject(settingsFile)
-        }
         buildFile << """
 dependencyLocking {
     lockAllConfigurations()
@@ -134,15 +128,12 @@ dependencies {
     }
 
     @Unroll
-    def 'does not fail when lock file contains entry that is not in resolution result'() {
+    def 'does not fail when lock file contains entry that is not in resolution result (initial unique: #unique)'() {
 
         given:
         mavenRepo.module('org', 'foo', '1.0').publish()
         mavenRepo.module('org', 'bar', '1.0').publish()
 
-        if (unique) {
-            FeaturePreviewsFixture.enableOneLockfilePerProject(settingsFile)
-        }
         buildFile << """
 dependencyLocking {
     lockAllConfigurations()
@@ -185,14 +176,11 @@ dependencies {
     }
 
     @Unroll
-    def 'does not fail when lock file does not contain entry for module in resolution result'() {
+    def 'does not fail when lock file does not contain entry for module in resolution result (initial unique: #unique)'() {
         given:
         mavenRepo.module('org', 'foo', '1.0').publish()
         mavenRepo.module('org', 'bar', '1.0').publish()
 
-        if (unique) {
-            FeaturePreviewsFixture.enableOneLockfilePerProject(settingsFile)
-        }
         buildFile << """
 dependencyLocking {
     lockAllConfigurations()
@@ -237,13 +225,10 @@ dependencies {
     }
 
     @Unroll
-    def 'does not fail when resolution result is empty and lock file contains entries'() {
+    def 'does not fail when resolution result is empty and lock file contains entries (initial unique: #unique)'() {
         given:
         mavenRepo.module('org', 'foo', '1.0').publish()
 
-        if (unique) {
-            FeaturePreviewsFixture.enableOneLockfilePerProject(settingsFile)
-        }
         buildFile << """
 dependencyLocking {
     lockAllConfigurations()
@@ -306,7 +291,7 @@ dependencies {
 }
 """
 
-        lockfileFixture.createLockfile('lockedConf',['org:foo:1.0'], false)
+        lockfileFixture.createLockfile('lockedConf',['org:foo:1.0'])
 
         when:
         run 'dependencies'
@@ -348,7 +333,7 @@ dependencies {
 }
 """
 
-        lockfileFixture.createLockfile('lockedConf',['org:bar:1.0', 'org:foo:1.0'], false)
+        lockfileFixture.createLockfile('lockedConf',['org:bar:1.0', 'org:foo:1.0'])
 
         when:
         run 'dependencies'
